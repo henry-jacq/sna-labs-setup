@@ -90,6 +90,7 @@ $ECHO "3) Generate Wireguard keys\n"
 $ECHO "4) Edit Wireguard Configs\n"
 $ECHO "5) Wireguard status\n"
 $ECHO "6) Connect to Labs\n"
+$ECHO "7) Install VSCode\n"
 $ECHO "q) Quit\n"
 }
 
@@ -169,6 +170,14 @@ wg_status () {
     
 }
 
+install_vscode () {
+    $ECHO "${GREEN}[*] Downloading VS Code...${NC}"
+    wget https://az764295.vo.msecnd.net/stable/3866c3553be8b268c8a7f8c0482c0c0177aa8bfa/code_1.59.1-1629375198_amd64.deb
+    $ECHO "${GREEN}[*] Installing VS Code...${NC}"
+    dpkg -i code_1.59.1-1629375198_amd64.deb 
+    $ECHO "${GREEN}[+] VS Code Installed${NC}"
+    rm code_1.59.1-1629375198_amd64.deb
+}
 
 # Not Included in Main Menu
 configs () {
@@ -404,7 +413,11 @@ else
                 wg_status
                 ;;
             6)
-                 connect_labs
+                connect_labs
+                ;;
+            7)
+                install_vscode
+
                 ;;
             q)
                 $ECHO "See you again!"
