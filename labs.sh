@@ -4,7 +4,6 @@ SSH="/usr/bin/ssh"
 WG="/usr/bin/wg"
 NCAT="/usr/bin/nc"
 NC="\e[0m"
-PV="pv -qL"
 RED="\e[31m"
 BLUE="\e[34m"
 GREEN="\e[32m"
@@ -43,6 +42,7 @@ while [[ $DPDCIES_PKG ]]; do
     else
         $ECHO "${RED}[-] Dependencies are not Installed${NC}"
         $ECHO "${GREEN}[*] Installing Dependencies${NC}"
+        apt-get update
         $DEB_PMI $DPDCIES_PKG
         $ECHO "${GREEN}[+] Dependencies are Installed${NC}"
         break
