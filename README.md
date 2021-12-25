@@ -8,6 +8,8 @@
   
   This Tool is useful for others who wants to configure lab setup on their linux machines easily.
   
+> This is a multi-use bash script for Linux machines to connect to [selfmade ninja labs](https://labs.selfmade.ninja).
+ 
 >Note:-
 >  This script is still under development. If you found any issues, please open a [issue](https://github.com/henry-jacq/sna-labs-setup/issues) in our repo or if want to add a feature to this you can !
  
