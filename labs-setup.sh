@@ -75,7 +75,7 @@ function help(){
 
 function warning_force(){
     $ECHO "${RED}\t---------------------------------------------------------------------------------${NC}"
-    $ECHO "${RED}\t| WARNING:\t\t\t\t\t\t\t\t\t|\n\t|\tFORCE MODE OVERWRITES ALL THE DATA RELATED TO 'WIREGUARD AND SSH-KEYS'\t| \n\t|\tIF IT EXISTS\t\t\t\t\t\t\t\t|${NC}"
+    $ECHO "${RED}\t| WARNING:\t\t\t\t\t\t\t\t\t|\n\t|\tFORCE MODE OVERWRITES ALL THE DATA RELATED TO 'WIREGUARD CONFIGS' AND \t| \n\t|\t'SSH-KEYS' IF IT EXISTS. THIS MODE IS RECOMMENDED FOR FIRST TIME SETTING|\n\t|\tUP, IF YOU NEED TO CHANGE CONFIGS AND OTHER THINGS USE INTERACTIVE MODE\t|${NC}"
     $ECHO "${RED}\t---------------------------------------------------------------------------------\n${NC}"
     # $ECHO "\n\tIf you agree to this hit [Enter] to continue or hit ctrl+c to stop this."
     $READ "        [?] If you agree to this hit [Enter] to continue or hit ctrl+c to stop this." && $SLEEP
@@ -153,6 +153,13 @@ function dependencies_install(){
     fi
 }
 
+function root_perm_check() {
+    if [ "$EUID" -ne 0 ]; then
+        $ECHO "\n\t[-] ${RED}Please run as root.${NC}" && $SLEEP
+        exit
+    fi
+}
+
 function post_sshkeys(){
     runuser -l $(users | awk '{print $1}') -c "cd ~/sna-labs-setup/ && ./ssh-keygen.sh"
 }
@@ -219,6 +226,7 @@ function main_call(){
     elif [[ $@ == "-f" ]] # Force mode #############
     then
         banner_common
+        root_perm_check
         warning_force
         intro_com "${GREEN}Enabled${NC}" "${RED}Disabled${NC}"
         force_start
@@ -227,6 +235,7 @@ function main_call(){
     elif [[ $@ == "--force" ]] # Force mode -f #############
     then
         banner_common
+        root_perm_check
         warning_force
         intro_com "${GREEN}Enabled${NC}" "${RED}Disabled${NC}"
         force_start
@@ -237,6 +246,7 @@ function main_call(){
         $ECHO "\t${RED}[-] No arguments is passed${NC}"
     fi
 }
+
 
 main_call "$@"
 # $ECHO "${BLUE}\n\t[!] All arguments passed to this script:${NC} $@\n"

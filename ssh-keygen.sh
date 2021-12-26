@@ -16,8 +16,8 @@ function sshkeys () {
     $ECHO "\n\t[*] ${ORANGE}Generating SSH key pair${NC}" && $SLEEP
     ssh-keygen -t rsa -b 2048
     $ECHO "$\n\t[*] ${GREEN}Generated SSH public key${NC}"
-    $ECHO $(cat $HOME/.ssh/id_rsa.pub)
-    $ECHO "\n\t[*] ${GREEN}Copy and Paste this publickey to (${GIT}-/profile/keys) If you don't paste that key, you can't access the labs.${NC}"
+    $ECHO "${ORANGE}\n\t$(cat $HOME/.ssh/id_rsa.pub)${NC}"
+    $ECHO "\n\t[*] ${GREEN}Copy and Paste this publickey to (${GIT}/-/profile/keys) If you don't paste that key, you can't access the labs.${NC}"
 }
 
 sshkeys
