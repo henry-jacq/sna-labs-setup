@@ -6,7 +6,7 @@
 
  
   
-  This Tool is useful for others who wants to configure lab setup on their linux machines easily.
+  This Tool is useful for others who wants to configure lab setup on their linux (Host) machines easily.
   
 > This is a multi-use bash script for Linux machines to connect to [selfmade ninja labs](https://labs.selfmade.ninja).
  
