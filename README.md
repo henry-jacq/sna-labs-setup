@@ -66,7 +66,7 @@ sudo dnf install git wireguard-tools
   
 | Arguments | Description |
 | --- | --- |
-| -f or --force| List all new or modified files |
-| -i or --interactive | Show file differences that haven't been staged |
-| -h or --help | print the help message |
-| -v or --version | Prints the version number |
+| -f or --force| This mode runs the script in force mode by this if any existing files related to wireguard and ssh keys are deleted or overwrited |
+| -i or --interactive | This mode allows the user to interact with a shell and do what they want. |
+| -h or --help | print the help message to the user. |
+| -v or --version | Prints the version number. |
