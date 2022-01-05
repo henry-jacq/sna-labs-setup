@@ -11,7 +11,7 @@
 > This is a multi-use bash script for Linux machines to connect to [selfmade ninja labs](https://labs.selfmade.ninja).
  
 >Note:-
->  This script is still under development. If you found any issues, please open a [issue](https://github.com/henry-jacq/sna-labs-setup/issues) in our repo or if want to contribute to this you can !
+>  This script is still under development. If you found any issues, please open a [issue](https://github.com/henry-jacq/sna-labs-setup/issues) in our repo or contribute your code to make this code even better
  
   - - -
 
