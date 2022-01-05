@@ -1,7 +1,7 @@
 # SNA Labs Setup for Linux
 
 <p align="center">
-<a href="https://github.com/henry-jacq/sna-labs-setup" rel="nofollow"><img src="https://img.shields.io/badge/version-1.12-red.svg" style="max-width:100%;"></a>
+<a href="https://github.com/henry-jacq/sna-labs-setup" rel="nofollow"><img src="https://img.shields.io/badge/version-2.00-red.svg" style="max-width:100%;"></a>
 <a href="https://github.com/henry-jacq/sna-labs-setup" rel="nofollow"><img src="https://img.shields.io/badge/status-beta-brightgreen.svg" style="max-width:100%;"></a>
 
  
