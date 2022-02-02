@@ -13,7 +13,7 @@
 # Date         : 2021-12-25
 # GitHub       : https://github.com/henry-jacq/
 # Gitlab       : https://git.selfmade.ninja/Henry/
-# Version      : 1.12
+# Version      : 1.21
 # Usage        : sudo ./labs-setup.sh
 # Bash Version : 4.2 or later
 # Info         : This script is still in development. If you found any issues, please open a issue in the respective git repositories.
@@ -109,7 +109,7 @@ function pm_checker(){
 }
 
 # For dependencies check
-
+# This is not called by main_call
 function dependencies_install(){
     pm_checker
     packages=(
@@ -210,7 +210,8 @@ function post_sshkeys(){
 function wg_gen_key_force () {
     $ECHO "\n\t================================================================================="
     $ECHO "\n\t[*] ${ORANGE}Initializing wireguard key pair generation...${NC}" && $SLEEP
-    if [[ -f $(pwd)/privatekey && $(pwd)/publickey ]]; then
+    cd ${WG_LOCATION}
+    if [[ -f ${WG_LOCATION}/privatekey && ${WG_LOCATION}/publickey ]]; then
         $ECHO "\n\t[*] ${RED}Wireguard Keys already exist !${NC}" && $SLEEP
         $ECHO "\n\t[*] ${BLUE}Removing the existing keys and regenerating new one${NC}" && $SLEEP
         $WG genkey | tee privatekey | $WG pubkey > publickey
@@ -224,7 +225,7 @@ function wg_gen_key_force () {
         $ECHO "\n\t================================================================================="
         $ECHO "\n\t[*] ${ORANGE}Initializing wireguard key pair generation...${NC}" && $SLEEP
         $SLEEP
-        $ECHO "\n\t[*] ${GREEN}wg keys saved at [$(pwd)]${NC}"
+        $ECHO "\n\t[*] ${GREEN}wg keys saved at [${WG_LOCATION})]${NC}"
         $WG genkey | tee privatekey | $WG pubkey > publickey
         $ECHO "\n\t[!] ${GREEN}Wireguard keys${NC}"
         $ECHO "\n\t[+] ${GREEN}PublicKey: ${NC}$(cat publickey)"
@@ -238,14 +239,11 @@ function wg_gen_key_force () {
 function wg_conf_checking(){
     $ECHO "\n\t================================================================================="
     $ECHO "\n\t${ORANGE}Analyzing wireguard configuration...${NC}" && $SLEEP
-    
-    if [[ -f $(pwd)/wg0.conf ]]; then
+    cd ${WG_LOCATION}
+    if [[ -f ${WG_LOCATION}/wg0.conf ]]; then
         $ECHO "\n\t[*] ${RED}Wireguard configuration already exists !${NC}" && $SLEEP
-        $ECHO "\n\t[*] ${BLUE}Removing the existing configuration and creating new one${NC}" && $SLEEP
-        touch $WG_CONF_LOCATION
-        $SLEEP
-        $ECHO "\n\t[!] ${GREEN}Regenerating new Config...${NC}" && $SLEEP
-        
+        $ECHO "\n\t[*] ${BLUE}Overwriting the existing configuration${NC}" && $SLEEP
+        $ECHO "" > $WG_CONF_LOCATION && $SLEEP
         $ECHO "[Interface]" > $WG_CONF_LOCATION
         $ECHO "PrivateKey = $(cat privatekey)" >> $WG_CONF_LOCATION
         $ECHO "Address = ${1}/32" >> $WG_CONF_LOCATION
@@ -256,15 +254,14 @@ function wg_conf_checking(){
         $ECHO "Endpoint = $WG_ENDPOINT" >> $WG_CONF_LOCATION
         $ECHO "PersistentKeepalive = $WG_PERSISTENT_KEEPALIVE" >> $WG_CONF_LOCATION
         
-        $ECHO "\n\t[*] ${GREEN}Configs generated !${NC}" && $SLEEP
-        $ECHO "\n\t[*] ${GREEN}wg0.conf saved at [$WG_CONF_LOCATION]${NC}"
+        $ECHO "\n\t[*] ${GREEN}Config modified !${NC}" && $SLEEP
+        $ECHO "\n\t[*] ${GREEN}wg0 conf saved at [$WG_CONF_LOCATION]${NC}"
     else
         $ECHO "\n\t================================================================================="
         $ECHO "\n\t[+] ${GREEN}Wireguard configuration doesn't exist !${NC}" && $SLEEP
         $ECHO "\n\t[*] ${ORANGE}Creating a new wireguard configuration...${NC}" && $SLEEP
-        touch $WG_CONF_LOCATION
-        $SLEEP
-        $ECHO "\n\t[!] ${GREEN}Generating new Config...${NC}" && $SLEEP
+        $ECHO "\n\t[!] ${GREEN}Generating new one...${NC}" && $SLEEP
+        touch $WG_CONF_LOCATION && $SLEEP
         
         $ECHO "[Interface]" > $WG_CONF_LOCATION
         $ECHO "PrivateKey = $(cat privatekey)" >> $WG_CONF_LOCATION
@@ -277,13 +274,13 @@ function wg_conf_checking(){
         $ECHO "PersistentKeepalive = $WG_PERSISTENT_KEEPALIVE" >> $WG_CONF_LOCATION
         
         $ECHO "\n\t[*] ${GREEN}Config generated !${NC}" && $SLEEP
-        $ECHO "\n\t[*] ${GREEN}wg0.conf saved at [$WG_CONF_LOCATION]${NC}"
-    fi
-    
+        $ECHO "\n\t[*] ${GREEN}wg0 conf saved at [$WG_CONF_LOCATION]${NC}"
+    fi 
 }
 
 function wg_gen_conf () {
     $ECHO "\n\t================================================================================="
+    $ECHO "\n\t[*] ${ORANGE}Initializing wireguard config generation... ${NC}" && $SLEEP
     $ECHO "\n\t[*] ${BLUE} Copy the VPN IP of your device shown in labs!${NC}"
     $ECHO "\n\t[*] ${BLUE} Carefully enter the IP. It can't be changed because this is force mode\n${NC}"
     $READ "        [?] Enter the address [Example: 172.20.0.60]: " iprange
@@ -296,54 +293,48 @@ function wg_gen_conf () {
             else
                 $ECHO "${RED}[-] '$WG_CONF_LOCATION' File does not Exist${NC}"
                 $ECHO "${GREEN}[*] Creating one${NC}"
-                touch $WG_CONF_LOCATION
-                $SLEEP
+                touch $WG_CONF_LOCATION && $SLEEP
                 wg_conf_checking $iprange
                 break
             fi
         else
             $ECHO "${RED}[-] '/etc/wireguard/' directory not found !${NC}"
-            $ECHO "${GREEN}[*] Creating directory '/etc/wireguard/' ${NC}"
-            $SLEEP
+            $ECHO "${GREEN}[*] Creating directory '/etc/wireguard/' ${NC}" && $SLEEP
             mkdir $WG_LOCATION
-            $SLEEP
         fi
     done
-    
 }
 
 function check_wg_up_or_not(){
     $ECHO "\n\t================================================================================="
-    $ECHO "\n\t${ORANGE}Checking if wireguard is up or not...${NC}"
+    $ECHO "\n\t${ORANGE}Checking if wireguard Interface is up or not...${NC}"
     $ECHO "\n\t================================================================================="
     
     pm_checker
     $PM_INSTALL net-tools > /dev/null 2>&1
-    ifconfig wg0 > /dev/null > /dev/null 2>&1
+    ifconfig wg0 > /dev/null 2>&1
     if [[ $? -eq 0 ]]; then
         $ECHO "${GREEN}\n\t[+] Wireguard interface is running${NC}"
     else
         $ECHO "${RED}\n\t{RED}[-] The Interface wg0 is Down${NC}"
         $ECHO "${GREEN}\n\t[+] Activating wireguard Interface (wg0)${NC}"
-        $(wg-quick up wg0 && $ECHO "${GREEN}\n\t[+] Wireguard interface is running${NC}") || $ECHO "[-] Connection Failed"
-        
+        $(wg-quick up wg0) || $ECHO "[-] Connection Failed"
         $WG show
     fi
 }
 
-##################################################################################################
+###############################################################################################
 
 function connect_labs () {
     
+    #### If labConnect exists #################################################################
     if [[ -f /usr/bin/labconnect ]]; then
         $ECHO "\n\t[*] ${GREEN}LabConnect is already installed !${NC}" && $SLEEP
         $ECHO "\n\t[*] ${BLUE}Started overwriting the labconnect...${NC}" && $SLEEP
         $ECHO "\n\t[*] ${BLUE}Carefully Enter the Username and Labs IP, because these are saved in config\n\t    for Future use.\n${NC}"
-        
         # Getting the username
         while true; do
             $READ "        [*] Enter the Username: " USERNAME
-            
             if [ $USERNAME ]; then
                 break
             else
@@ -351,32 +342,32 @@ function connect_labs () {
             fi
         done
         $ECHO "\n"
+
         # Getting the labs IP
         while true; do
             $READ "        [*] Enter the Labs IP: " LABS_IP
             if [[ "$LABS_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                 break
             else
-                $ECHO "\n\t[-] ${RED}Invalid IP !${NC}\n"
+                $ECHO "\n\t[-] ${RED}Invalid IP! Try again${NC}\n"
             fi
         done
         
-        # Testing that if the connection is available or not
+        # Testing if the connection to labs is available or not
         $ECHO "-" | $NCAT -w $TIMEOUT $LABS_IP $PORT &> /dev/null
-        
-        $ECHO "\n\t${GREEN}[+] Trying to SSH into $USERNAME@$LABS_IP${NC}"
+        $ECHO "\n\t${GREEN}[+] Checking if the ssh connection ($USERNAME@$LABS_IP) possible or not${NC}"
         
         if [ $? -eq 0 ]; then
-            $ECHO "\n\t${GREEN}[+] Connection Available${NC}" && $SLEEP
+            $ECHO "\n\t${GREEN}[+] Connection available${NC}" && $SLEEP
             $ECHO "\n\t${GREEN}[+] Establishing the Connection${NC}"
             $SSH $USERNAME@$LABS_IP || $ECHO "\n\t${RED}[-] Connection Failed"
             $ECHO "#!/bin/bash" > $LABSCONNECT_LCT
             $ECHO "" >> $LABSCONNECT_LCT
             $ECHO "ssh $USERNAME@$LABS_IP" >> $LABSCONNECT_LCT
-            $ECHO "\n\t${GREEN}[+] Command Created [/usr/bin/labconnect] ${NC}"
+            $ECHO "\n\t${GREEN}[+] Command Recreated [/usr/bin/labconnect] ${NC}"
             $ECHO "\n\t${GREEN}[+] You can use this command 'sudo labconnect' to access labs directly without running this script${NC}"
         else
-            $ECHO "\n\t${RED}[-] Connection Not available ${NC}"
+            $ECHO "\n\t${RED}[-] Connection not available ${NC}"
             $ECHO "${BLUE}Note:${NC}"
             $ECHO "${BLUE}[*] Try to ping 172.20.0.1 or 172.20.0.0${NC}"
             $ECHO "${BLUE}[*] Try to redeploy the labs${NC}"
@@ -384,8 +375,8 @@ function connect_labs () {
             $ECHO "${BLUE}[*] Check That the Wireguard Interface Up or not${NC}"
             $ECHO "${BLUE}[*] Check That the generated ssh-keys are uploaded to $GIT_SERVER ${NC}"
         fi
-        
-        ###################################################################################################
+    
+    #### If labConnect not exists #####################################################################
     else
         $ECHO "\n\t[*] ${BLUE}Carefully Enter the Username and Labs IP, because these are saved in config\n\t    for Future use.\n${NC}"
         
@@ -398,6 +389,7 @@ function connect_labs () {
                 $ECHO "\n\t[-] ${RED}Username Invalid${NC}\n"
             fi
         done
+        
         $ECHO "\n"
         # Getting the labs IP
         while [[ connect_labs ]]; do
@@ -409,13 +401,12 @@ function connect_labs () {
             fi
         done
         
-        # Testing if the connection is available or not
+        # Testing if the connection to labs is available or not
         $ECHO "-" | $NCAT -w $TIMEOUT $LABS_IP $PORT &> /dev/null
-        
-        $ECHO "\n\t${GREEN}[+] Trying to SSH into $USERNAME@$LABS_IP${NC}"
+        $ECHO "\n\t${GREEN}[+] Checking if the ssh connection ($USERNAME@$LABS_IP) possible or not${NC}"
         
         if [ $? -eq 0 ]; then
-            $ECHO "\n\t${GREEN}[+] Connection Available${NC}" && $SLEEP
+            $ECHO "\n\t${GREEN}[+] Connection available${NC}" && $SLEEP
             $ECHO "\n\t${GREEN}[+] Establishing the Connection${NC}"
             $SSH $USERNAME@$LABS_IP || $ECHO "\n\t${RED}[-] Connection Failed"
             touch $LABSCONNECT_LCT
@@ -423,7 +414,7 @@ function connect_labs () {
             $ECHO "#!/bin/bash" > $LABSCONNECT_LCT
             $ECHO "" >> $LABSCONNECT_LCT
             $ECHO "ssh $USERNAME@$LABS_IP" >> $LABSCONNECT_LCT
-            $ECHO "\n\t${GREEN}[+] Command Recreated [/usr/bin/labconnect] ${NC}"
+            $ECHO "\n\t${GREEN}[+] Command Created [/usr/bin/labconnect] ${NC}"
             $ECHO "\n\t${GREEN}[+] You can use this command 'sudo labconnect' to access labs directly without running this script${NC}"
         else
             $ECHO "\n\t[-] ${RED}Connection not available ${NC}"
@@ -435,10 +426,7 @@ function connect_labs () {
             $ECHO "\n\t[*] ${BLUE}Check That the generated ssh-keys are uploaded to $GIT_SERVER ${NC}"
         fi
     fi
-    
 }
-
-##################################################################################################
 
 # banner_common
 # root_perm_check
