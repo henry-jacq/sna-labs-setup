@@ -20,7 +20,7 @@ function sshkeys () {
     $ECHO "\n\t[*] ${ORANGE}Generating SSH key pair\n${NC}" && $SLEEP
     ssh-keygen -t rsa -b 2048
     $ECHO "$\n\t[*] ${GREEN}Generated SSH public keys${NC}"
-    $ECHO "${BLUE}\n\t$(batcat $HOME/.ssh/*.pub)${NC}"
+    $ECHO "${BLUE}\n\t$(cat $HOME/.ssh/*.pub)${NC}"
     $ECHO "\n\t[*] ${GREEN}Copy and Paste this publickey to ${NC}(${GIT}/-/profile/keys)${GREEN}\n\t    otherwise you can't access the labs.\n${NC}"
     $READ "        [*] If you done this press [Enter] to continue..."
 }

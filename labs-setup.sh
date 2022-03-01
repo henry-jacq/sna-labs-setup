@@ -130,6 +130,7 @@ function dependencies_install(){
             $ECHO "\n\t[+] ${GREEN}Package Manager Got Updated !${NC}" && $SLEEP
         else
             $ECHO "\n\t[-] ${RED}Something wrong with your Package Manager, Kindly check it manually.${NC}" && $SLEEP
+            exit 1
         fi
         $ECHO "\n\t[*] ${ORANGE}Trying to install dependencies...${NC}"
         $PM_INSTALL $packages > /dev/null 2>&1 && $SLEEP
@@ -223,10 +224,7 @@ function wg_gen_key_force () {
         $ECHO "\n\t[*] ${GREEN}Copy and paste the publickey to ${NC}(${LABS}/devices/add) ${GREEN}for\n\t    accessing labs through this VPN${NC}\n"
         $READ "        [*] If you done this press [Enter] to continue..."
     else
-        $ECHO "\n\t============================================================================="
-        $ECHO "\n\t[*] ${ORANGE}Initializing wireguard key pair generation...${NC}" && $SLEEP
-        $SLEEP
-        $ECHO "\n\t[*] ${GREEN}wg keys saved at [${WG_LOCATION})]${NC}"
+        $ECHO "\n\t[*] ${GREEN}wg keys saved at [${WG_LOCATION}]${NC}"
         $WG genkey | tee privatekey | $WG pubkey > publickey
         $ECHO "\n\t[!] ${GREEN}Wireguard keys${NC}"
         $ECHO "\n\t[+] ${GREEN}PublicKey: ${NC}$(cat publickey)"
@@ -239,7 +237,7 @@ function wg_gen_key_force () {
 # This is not called by main_call
 function wg_conf_checking(){
     $ECHO "\n\t================================================================================="
-    $ECHO "\n\t${ORANGE}Analyzing wireguard configuration...${NC}" && $SLEEP
+    $ECHO "\n\t${ORANGE}[*] Analyzing wireguard configuration...${NC}" && $SLEEP
     cd ${WG_LOCATION}
     if [[ -f ${WG_LOCATION}/wg0.conf ]]; then
         $ECHO "\n\t[*] ${RED}Wireguard configuration already exists !${NC}" && $SLEEP
@@ -282,7 +280,7 @@ function wg_conf_checking(){
 function wg_gen_conf () {
     $ECHO "\n\t================================================================================="
     $ECHO "\n\t[*] ${ORANGE}Initializing wireguard config generation... ${NC}" && $SLEEP
-    $ECHO "\n\t[*] ${BLUE} Copy the VPN IP of your device shown in labs!${NC}"
+    $ECHO "\n\t[*] ${BLUE} Copy the VPN IP of your device shown in labs${NC}"
     $ECHO "\n\t[*] ${BLUE} Carefully enter the IP. It can't be changed because this is force mode\n${NC}"
     $READ "        [?] Enter the address [Example: 172.20.0.60]: " iprange
     
@@ -292,8 +290,8 @@ function wg_gen_conf () {
                 wg_conf_checking $iprange
                 break
             else
-                $ECHO "${RED}[-] '$WG_CONF_LOCATION' File does not Exist${NC}"
-                $ECHO "${GREEN}[*] Creating one${NC}"
+                $ECHO "\n\t${RED}[-] '$WG_CONF_LOCATION' File does not Exist${NC}"
+                $ECHO "\n\t${GREEN}[*] Creating one${NC}"
                 touch $WG_CONF_LOCATION && $SLEEP
                 wg_conf_checking $iprange
                 break
@@ -308,7 +306,7 @@ function wg_gen_conf () {
 
 function check_wg_up_or_not(){
     $ECHO "\n\t================================================================================="
-    $ECHO "\n\t${ORANGE}Checking if wireguard Interface is up or not...${NC}"
+    $ECHO "\n\t${ORANGE}[*] Checking if wireguard Interface is up or not...${NC}"
     $ECHO "\n\t================================================================================="
     
     pm_checker
@@ -317,7 +315,7 @@ function check_wg_up_or_not(){
     if [[ $? -eq 0 ]]; then
         $ECHO "${GREEN}\n\t[+] Wireguard interface is running${NC}"
     else
-        $ECHO "${RED}\n\t{RED}[-] The Interface wg0 is Down${NC}"
+        $ECHO "${RED}\n\t{RED}[-] The Interface wg0 is down${NC}"
         $ECHO "${GREEN}\n\t[+] Activating wireguard Interface (wg0)${NC}"
         $(wg-quick up wg0) || $ECHO "[-] Connection Failed"
         $WG show
