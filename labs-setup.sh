@@ -186,6 +186,7 @@ function intro_com(){
         $ECHO "\n\t[I] ${RED}Root privileges ${NC}${GREEN}\t[Detected]${NC}"
     else
         $ECHO "\n\t[-] ${RED}Root privileges ${NC}${RED}\t[Not-Detected]${NC}"
+        exit 1
     fi
     
     $ECHO "\n\t[I] ${ORANGE}Force mode\t\t${NC}:${GREEN} $1 ${NC}" && $SLEEP
@@ -222,7 +223,7 @@ function wg_gen_key_force () {
         $ECHO "\n\t[*] ${GREEN}Copy and paste the publickey to ${NC}(${LABS}/devices/add) ${GREEN}for\n\t    accessing labs through this VPN${NC}\n"
         $READ "        [*] If you done this press [Enter] to continue..."
     else
-        $ECHO "\n\t================================================================================="
+        $ECHO "\n\t============================================================================="
         $ECHO "\n\t[*] ${ORANGE}Initializing wireguard key pair generation...${NC}" && $SLEEP
         $SLEEP
         $ECHO "\n\t[*] ${GREEN}wg keys saved at [${WG_LOCATION})]${NC}"
