@@ -2,7 +2,7 @@
 
 # This script allows user to connect labs
 
-conf_lc=".config/wg.txt"
+conf_lc="~/.config/wg.txt"
 
 # It generates config
 function _create_config() {
