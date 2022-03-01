@@ -474,10 +474,10 @@ function main_call(){
         warning_force
         intro_com "${GREEN}Enabled${NC}" "${RED}Disabled${NC}"
         force_start
-        # post_sshkeys
-        # wg_gen_key_force
-        # wg_gen_conf
-        # check_wg_up_or_not
+        post_sshkeys
+        wg_gen_key_force
+        wg_gen_conf
+        check_wg_up_or_not
         connect_labs
         
     elif [[ $@ == "--force" ]] # Force mode -f #############
@@ -487,10 +487,10 @@ function main_call(){
         warning_force
         intro_com "${GREEN}Enabled${NC}" "${RED}Disabled${NC}"
         force_start
-        # post_sshkeys
-        # wg_gen_key_force
-        # wg_gen_conf
-        # check_wg_up_or_not
+        post_sshkeys
+        wg_gen_key_force
+        wg_gen_conf
+        check_wg_up_or_not
         connect_labs
     else
         help_box
