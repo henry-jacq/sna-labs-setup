@@ -1,0 +1,143 @@
+#!/bin/bash
+
+# This script allows user to connect labs
+
+conf_lc=".config/wg.txt"
+
+# It generates config
+function _create_config() {
+	if [[ ! -f $conf_lc ]]; then
+		touch $conf_lc
+		echo "# Config file created by connect-labs" > $conf_lc
+		echo "user=$1" >> $conf_lc
+		echo "ip=$2" >> $conf_lc
+	fi
+}
+
+# Getting username and ip from user
+function _get_info() {
+	
+	while true; do
+	    read -p "[?] Enter the username: " username
+	    if [ $username ]; then
+	    	export UR_NAME="$username"
+	        break
+	    else
+	        echo -e "[-] Invalid Username\n"
+	    fi
+	done
+
+    while true; do
+        read -p "[?] Enter the Lab's IP: " labs_ip
+        if [[ "$labs_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            export UR_IP="$labs_ip"
+            break
+        else
+            echo -e "[-] Invalid IP! Try again\n"
+        fi
+    done
+    echo ""
+
+}
+
+# Main thing to first
+# This function writes data to config
+function check_info() {
+	local junk
+
+	echo -e "\n############## SNA Lab connect tool ##############\n"
+
+	_get_info
+
+	read -p "[?] Is this information correct or not? [Y/n] " junk
+
+	while [[ $junk ]]; do
+		case $junk in
+			y|Y)
+				echo -e "\n=> Creating config...\n" && sleep 1
+				_create_config ${UR_NAME} ${UR_IP}
+				echo -e "=> Config created!\n"
+				echo -e "=> Try to run this script again.\n"
+				break
+			;;
+			n|N)
+				echo -e "\n[!] Type the creds carefully!\n"
+				_get_info
+				echo -e "\n=> Creating config...\n" && sleep 1
+				_create_config ${UR_NAME} ${UR_IP}
+				echo -e "=> Config created!\n"
+				echo -e "=> Try to run this script again.\n"
+				break
+			;;
+			*)
+				echo "[*] Try again! Bye..."
+				break
+			;;
+		esac
+	done
+	exit
+}
+
+# Getting data from config
+function _getting_creds_from_config() {
+	local grep_user grep_ip
+
+	grep_user=$(cat $conf_lc | grep "user" | awk -F= '{print $2}')
+	grep_ip=$(cat $conf_lc | grep "ip" | awk -F= '{print $2}')
+
+	if [[ $grep_user == "" && $grep_ip == "" ]]; then
+		echo -e "\n[-] Username and IP not found!\n"
+		check_info
+	elif [[ $grep_user == "" ]]; then
+		echo -e "\n[-] Username not found!\n"
+		check_info
+	elif [[ $grep_ip == "" ]]; then
+		echo -e "\n[-] IP not found!\n"
+		check_info
+	else
+		export user_c="${grep_user}"
+		export ip_c="${grep_ip}"
+	fi
+}
+
+function ssh_labs() {
+	local junk
+	read -p "[?] Want to connect to labs? [Y/n] " junk
+
+	if [[ $junk == "" ]]; then
+		echo "[+] SSHing into ${user_c}@${ip_c}"
+		ssh ${user_c}@${ip_c}
+	elif [[ $junk == "y" || $junk == "Y" ]]; then
+		echo "[+] SSHing into ${user_c}@${ip_c}"
+		ssh ${user_c}@${ip_c}
+	else
+		echo "[-] Exiting..."
+	fi
+}
+
+function check_wg_status() {
+	local check
+	
+	check=$(ip a | grep "wg")
+
+	if [[ $check == "" ]]; then
+		echo "[*] Wireguard not seems to be up"
+		echo "[*] We are enabling wireguard (wg0) for you"
+		wg-quick up wg0
+		echo "[!] Wireguard enabled"
+	else
+		echo "[!] Wireguard seems to be up!"
+	fi
+}
+
+function main() {
+	if [[ -f $conf_lc ]]; then
+		_getting_creds_from_config
+		check_wg_status
+		ssh_labs
+	else
+		check_info
+	fi
+}
+
+main
