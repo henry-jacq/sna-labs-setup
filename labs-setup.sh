@@ -133,6 +133,7 @@ function dependencies_install(){
             exit 1
         fi
         $ECHO "\n\t[*] ${ORANGE}Trying to install dependencies...${NC}"
+        $ECHO "\n\t[*] ${ORANGE}Wait for some minutes...${NC}"
         $PM_INSTALL $packages > /dev/null 2>&1 && $SLEEP
         if [ $? -eq 0 ]; then
             $ECHO "\n\t[+] ${GREEN}Dependencies got installed !${NC}" && $SLEEP
