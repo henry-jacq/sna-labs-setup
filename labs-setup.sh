@@ -113,7 +113,7 @@ function pm_checker(){
 function dependencies_install(){
     pm_checker
     packages=(
-        "wireguard-tools"
+        "openssh wireguard-tools"
     )
     if [[ $PM == "apt-get" ]]; then
         $PM_INSTALL wireguard > /dev/null 2>&1
