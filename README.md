@@ -6,7 +6,7 @@
 
  
   
-  This Tool is useful for others who wants to configure lab setup on their linux (Host) machines easily.
+  This Tool is useful for others wants to configure labs setup on their linux (Host) machines easily.
   
 > This is a multi-use bash script for Linux machines to connect to [SNA Labs](https://labs.selfmade.ninja).
  
@@ -53,11 +53,11 @@ sudo dnf install git wireguard-tools
 ### Installation
 ```git clone https://github.com/henry-jacq/sna-labs-setup.git```
    
-### For Permissions
-```chmod +x *```
-
 ### Navigate
 ```cd sna-labs-setup```
+
+### Permissions
+```chmod +x *```
   
 ### Execution
 ```sudo ./labs-setup.sh <option>```
