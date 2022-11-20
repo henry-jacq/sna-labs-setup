@@ -6,7 +6,7 @@
 
  
   
-  This Tool is useful for others wants to configure labs setup on their linux (Host) machines easily.
+  This Tool is useful for those who wants to configure labs setup on their linux (Host) machines easily.
   
 > This is a multi-use bash script for Linux machines to connect to [SNA Labs](https://labs.selfmade.ninja).
  
